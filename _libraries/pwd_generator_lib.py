@@ -72,7 +72,6 @@ class PwdGen(DictFileWorker, Config):
         'count': {'min_val': 1, 'max_val': 20, 'default': 5},
         'words_count': {'min_val': 2, 'max_val': 6, 'default': 4},
         'char_count': {'min_val': 3, 'max_val': 5, 'default': 3},
-        # TODO: возможно заменить на True для реализации сброса параметров в кастомного пароля к дефолту
         'use_numbers': {'default': False},
         'use_special': {'default': False},
         'use_upper_case': {'default': False},
@@ -84,6 +83,7 @@ class PwdGen(DictFileWorker, Config):
         # super().__init__()
         # super(DictFileWorker, self).__init__()
         DictFileWorker.__init__(self)
+        # при вызове конструктора базового класса Config передаются словарь с дефолтными параметрами кастомных паролей на случай возвращения к ним 
         Config.__init__(self, conf_filename, self.__PASSPHRASE_PRESETS["custom"])
         self.__randomizer = SystemRandom()
         self.__dictionaries_filenames = {
@@ -94,8 +94,8 @@ class PwdGen(DictFileWorker, Config):
             'INFN': f'{dict_files_path}/verbs.txt'
         }
 
-        # обновляем пользовательсике (кастомные) параметры парольной фразы в словаре __PASSPHRASE_PRESETS
-        # параметры хранятся в поле радительского класса Config
+        # обновляем пользовательские (кастомные) параметры парольной фразы, занося из в словарь __PASSPHRASE_PRESETS
+        # параметры хранятся в поле радительского класса Config и были предварительно считаны из conf.ini
         custom_options = self.get_options()
         self.__update_custom_passphrase_options(options=custom_options, is_upd_file=False)
     
@@ -289,37 +289,43 @@ class PwdGen(DictFileWorker, Config):
                 # 'use_special': self.__check_custom_bool_option(option=options["use_special"], default=False),
                 # 'use_upper_case': self.__check_custom_bool_option(option=options["use_upper_case"], default=False)
 
-                'words_count': self.__check_custom_int_option(option=options["words_count"],
+                'words_count': self.__check_custom_int_option(option_name='words_count',
+                                                              option=options["words_count"],
                                                               default=self.CMD_OPTIONS_DEFAULTS["words_count"]["default"],
                                                               min_val=self.CMD_OPTIONS_DEFAULTS["words_count"]["min_val"],
                                                               max_val=self.CMD_OPTIONS_DEFAULTS["words_count"]["max_val"]),
-                'char_count': self.__check_custom_int_option(option=options["char_count"],
+                'char_count': self.__check_custom_int_option(option_name='char_count',
+                                                             option=options["char_count"],
                                                              default=self.CMD_OPTIONS_DEFAULTS["char_count"]["default"],
                                                              min_val=self.CMD_OPTIONS_DEFAULTS["char_count"]["min_val"],
                                                              max_val=self.CMD_OPTIONS_DEFAULTS["char_count"]["max_val"]),
-                'use_numbers': self.__check_custom_bool_option(option=options["use_numbers"],
+                'use_numbers': self.__check_custom_bool_option(option_name='use_numbers',
+                                                               option=options["use_numbers"],
                                                                default=True),
-                'use_special': self.__check_custom_bool_option(option=options["use_special"],
+                'use_special': self.__check_custom_bool_option(option_name='use_special',
+                                                               option=options["use_special"],
                                                                default=self.CMD_OPTIONS_DEFAULTS["use_special"]["default"]),
-                'use_upper_case': self.__check_custom_bool_option(option=options["use_upper_case"],
+                'use_upper_case': self.__check_custom_bool_option(option_name='use_upper_case',
+                                                                  option=options["use_upper_case"],
                                                                   default=self.CMD_OPTIONS_DEFAULTS["use_upper_case"]["default"])
             }
         except Exception as err:
             # обработка исключения - не найден ключ в словаре options; все пользовательские параметры сбрасываются к значениям по умолчанию
-            logger_lib.error('update options', f'Parameter {err} not found (probably, in configuration file). Default options will be used')
+            logger_lib.error('Update custom passphrase options', f'Parameter {err} not found (probably, in configuration file). Default parameters will be used')
             self.set_defaults_options()
         
         # при необходимости записываем изменения в конфигурационный файл для последующего использования
         if is_upd_file:
             self.set_options(self.__PASSPHRASE_PRESETS["custom"])
     
-    def __check_custom_int_option(self, option:str, default:int, min_val:int, max_val:int) -> int:
+    def __check_custom_int_option(self, option_name:str, option:str, default:int, min_val:int, max_val:int) -> int:
         """
         Метод валидации и определения целочисленных параметров пользовательской (кастомной) парольной фразы.
         Введенное пользователем значение прооверяется:
         1. Должно быть целым числом (содержать только цифры)
         2. Должно входить в допустимый диапазон значения параметра
         Если не выполняется любое из этих условий, то параметр парольной фразы принимает значение по умолчанию
+        :param option_name: наименование параметра парольной фразы, который введен пользователем
         :param option: параметр парольной фразы, который введен пользователем
         :param default: значение параметра по умолчанию
         :param min_val: минимальное значение допустимого диапазона параметра
@@ -330,11 +336,12 @@ class PwdGen(DictFileWorker, Config):
         #     char_count = 3
 
         if match(r'^[0-9]+$', option) is None or int(option) not in range(min_val, max_val+1):
+            logger_lib.warning(f'Update parameter \'{option_name}\'', f'Invalid parameter value; default value is used')
             return default
         else:
             return int(option)
 
-    def __check_custom_bool_option(self, option:str, default:bool=True) -> bool:
+    def __check_custom_bool_option(self, option_name:str, option:str, default:bool=True) -> bool:
         """
         Метод валидации и определения булевых параметров пользовательской (кастомной) парольной фразы
         Проверка и определение конечного значения проводится в два этапа:
@@ -343,6 +350,7 @@ class PwdGen(DictFileWorker, Config):
         указанные пользователем положительный/отрицательный ответ. В случае результата провеки =false (ничего не введено или
         ввдено любое некооректное значение), то пераметр определяется как значение по умолчанию
         2. В случае =true первой проверки, определяется значение параметра парольной фразы исходя из вхождения в списки yes_ans
+        :param option_name: наименование параметра парольной фразы, который введен пользователем
         :param option: параметр парольной фразы, который введен пользователем. Ожидается, что параметр принимает значения из списков yes_ans или no_ans.
             Все прочие значения будут инетрпритироваться как значения по умолчанию 
         :param default: булево значение параметра по умолчанию для параметра парольной фразы
@@ -361,4 +369,5 @@ class PwdGen(DictFileWorker, Config):
         if (option in YES_NAS) != (option in NO_ANS):
             return True if option in YES_NAS else False
         else:
+            logger_lib.warning(f'Update parameter \'{option_name}\'', f'Invalid parameter value; default value is used')
             return default

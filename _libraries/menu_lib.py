@@ -24,7 +24,7 @@ class Menu():
             print('\r\nPassphrase options')
             print('    [5] Show current custom passphrase options')
             print('    [6] Set custom passphrase options')
-            # print('    [7] Reset custom passphrase settings to defaults')
+            print('    [7] Reset custom passphrase settings to defaults')
             print('[0] exit')
 
             # switcher = {1: 'weak', 2: 'standard', 3: 'strong', 4: 'custom'}
@@ -37,8 +37,12 @@ class Menu():
                     self.__pwd_gen.show_passphrase_options('custom')
                     continue
                 if int(compl_input) == 6:
-                    # задание параметров пользовательского парольной фразы
+                    # задание кастомных (пользовательских) параметров парольной фразы
                     self.__pwd_gen.set_custom_passphrase_options()
+                    continue
+                if int(compl_input) == 7:
+                    # сброс кастомных (пользовательских) параметров парольной фразы к дефолтным значениям
+                    self.__pwd_gen.set_defaults_options()
                     continue
                 # определяем сложность генерируемого пароля из пресетов (=str)
                 compl = list_pwd_compl[int(compl_input) - 1]
