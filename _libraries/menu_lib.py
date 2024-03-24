@@ -42,7 +42,11 @@ class Menu():
                     continue
                 if int(compl_input) == 7:
                     # сброс кастомных (пользовательских) параметров парольной фразы к дефолтным значениям
-                    self.__pwd_gen.set_defaults_options()
+                    if self.__pwd_gen.set_defaults_options() == 0:
+                        print(f'Custom passphrase settings have been restored to defauls.')
+                        self.__pwd_gen.show_passphrase_options('custom')
+                    else:
+                        print('Error bringing custom passphrase settings to default values.')
                     continue
                 # определяем сложность генерируемого пароля из пресетов (=str)
                 compl = list_pwd_compl[int(compl_input) - 1]
@@ -71,30 +75,3 @@ class Menu():
                 break
             finally:
                 print()
-
-    # TODO: создание паролей на оснве XKCD вынести в отдельную подзадачу
-    # pwdgen = XKCD(None)
-    # while True:
-    #     print('Please, select password complexity:')
-    #     print('[1] Weak')
-    #     print('[2] Normal')
-    #     print('[3] Strong')
-    #     print('[4] Custom')
-    #     print('[0] exit')
-
-    #     switcher = {
-    #         1: pwdgen.weak,
-    #         2: pwdgen.normal,
-    #         3: pwdgen.strong,
-    #         4: pwdgen.custom
-    #     }
-
-    #     inpt = input('-> ')
-    #     try:
-    #         if int(inpt) == 0: break
-    #         pwd_fun = switcher.get(int(inpt))
-    #         print(pwd_fun())
-    #     except Exception:            
-    #         print('Something went wrong. Possibly an invalid input!')
-    #         continue
-    # del pwdgen

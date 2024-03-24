@@ -22,6 +22,11 @@ main.py -compl strong -c 6
 main.py [-c COUNT] [-w WORD_COUNT] [-l LETTER_COUNT] [-n] [-s] [-u]
 # for example: generate 2 password consisting of 4 words and numbers
 main.py -c 2 -w 4 -n
+
+# generate password using xkcd library
+pwdgen [--xkcd {weak,standard,strong,super}] [-c COUNT]
+# for example: generate 3 xkcd super password
+main.py -xkcd super -c 3
 ```
 
 You can also use the simplest console menu, which can be called with the command

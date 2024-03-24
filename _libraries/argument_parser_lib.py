@@ -5,6 +5,7 @@ import argparse
 from platform import system
 
 from _libraries.pwd_generator_lib import PwdGen
+from _libraries.xkcd_generator_lib import XKCD
 from _libraries.menu_lib import Menu
 # endregion
 
@@ -52,7 +53,10 @@ class ArgumentParser():
                                     pwdgen [--compl {weak,standard,strong}] [-c COUNT]
                                         
                                 Generate passphrases with user (custom) parameters:
-                                    pwdgen [-c COUNT] [-w WORD_COUNT] [-l LETTER_COUNT] [-n] [-s] [-u]""")
+                                    pwdgen [-c COUNT] [-w WORD_COUNT] [-l LETTER_COUNT] [-n] [-s] [-u]
+                                   
+                                Generate password using xkcd library:
+                                    pwdgen [--xkcd {weak,standard,strong,super}] [-c COUNT]""")
         )
         # добавление необходимых опций и их параметров (допустимые значения, значения по умолчанию, тип данных и прочее)
         self.__parser.add_argument('-m', '--main-menu',
@@ -62,13 +66,18 @@ class ArgumentParser():
                                    choices=['weak', 'standard', 'strong'],
                                    default='standard',
                                    type=str,
-                                   help='Complexity of the generated passphrase')
+                                   help='Complexity of the generated password')
+        self.__parser.add_argument('--xkcd',
+                                   choices=['weak', 'standard', 'strong', 'super'],
+                                   default='standard',
+                                   type=str,
+                                   help='Complexity of the generated password (password is generated based on the xkcd library)')
         self.__parser.add_argument('-c', '--count',
                                    choices=range(PwdGen.CMD_OPTIONS_DEFAULTS["count"]["min_val"], PwdGen.CMD_OPTIONS_DEFAULTS["count"]["max_val"] + 1),
                                    default=PwdGen.CMD_OPTIONS_DEFAULTS["count"]["default"],
                                    type=int,
                                    metavar='COUNT',
-                                   help='Number of generated passphrases') 
+                                   help='Number of generated passwords') 
         self.__parser.add_argument('-w', '--word-count',
                                    choices=range(PwdGen.CMD_OPTIONS_DEFAULTS["words_count"]["min_val"], PwdGen.CMD_OPTIONS_DEFAULTS["words_count"]["max_val"] + 1),
                                    default=PwdGen.CMD_OPTIONS_DEFAULTS["words_count"]["default"],
@@ -113,6 +122,19 @@ class ArgumentParser():
                 menu = Menu(self.__pwd_gen)
                 menu.show_main_menu()
                 del menu
+            else:
+                self.__incorrect_cmd_options_handler()
+        
+        # использована опция --xkcd -> генерирование парольных фраз на основе библиотеки xkcd
+        elif '--xkcd' in sys.argv:
+            # допустимо указание только шаблона сложности пароля (длина массива sys.argv строго равна 3)
+            # и/или число гененрируемых парольных фраз (длина sys.argv может быть увеличена до 5)
+            # в противном случае - неверный формат ввода
+            if len(sys.argv) == 3 or (len(sys.argv) == 5 and ('--count' in sys.argv or '-c' in sys.argv)):
+                xkcd_obj = XKCD()
+                # генерируем парольные фразы и выводим пользователю
+                for ind in range(int(self.__args.count)):
+                    print(xkcd_obj.generate_passphrase(self.__args.xkcd))
             else:
                 self.__incorrect_cmd_options_handler()
         

@@ -50,7 +50,7 @@ class Config():
             logger_lib.error(self.__filename, err)
 
     # write parameters to file
-    def write_settings(self) -> None:
+    def write_settings(self) -> int:
         try:            
             # открытие файла на запись
             # если файл содержит какие-либо данные, то они будут перезаписаны
@@ -58,8 +58,10 @@ class Config():
             with closing(open(self.__filename, "w")) as ini_file:
                 # запись параметров в указанный файл
                 self.__config.write(ini_file)
+                return 0
         except Exception as err:
             logger_lib.error(self.__filename, err)
+            return -1
 
     def __create_config_file(self, options:dict) -> None:
         """
@@ -107,8 +109,8 @@ class Config():
         for key, value in options.items():
             self.__config.set('passphrase', key, str(value))
         # запись изменений в файл
-        self.write_settings()
-
+        return self.write_settings()
+    
     def set_defaults_options(self) -> None:
         """
         Сброс всех пользовательских параметров парольной фразы в значения по умолчанию. Метод применяется если:
@@ -119,4 +121,4 @@ class Config():
         for itm in self.__config.sections():
             self.__config.remove_section(itm)
         # добавление секции passphrase с параметрами по умолчанию
-        self.set_options(self.__defaults)
+        return self.set_options(self.__defaults)
