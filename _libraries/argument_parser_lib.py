@@ -12,18 +12,19 @@ from _libraries.menu_lib import Menu
 
 class ArgumentParser():
     # default constructor
-    def __init__(self, dict_files_path:str, conf_filename:str) -> None:
+    def __init__(self, dict_filespath:str, conf_filename:str) -> None:
         # инициализация объекта, раелизующего интерфейс командной строки
         self.__parser = None
         self.__args = None
+        self.__xkcd_dict = dict_filespath + '/xkcd/eff_large_wordlist.txt'
         self.__init_parser_obj()
 
         # подготовка и инициализация объекта, реализующего непосредственно генерацию парольных фраз
         if system() == 'Windows':
-            dict_files_path = dict_files_path + '/win'
+            dict_filespath = dict_filespath + '/win'
         else:
-            dict_files_path = dict_files_path + '/lin'
-        self.__pwd_gen = PwdGen(dict_files_path, conf_filename)
+            dict_filespath = dict_filespath + '/lin'
+        self.__pwd_gen = PwdGen(dict_filespath, conf_filename)
     
     # default destructor
     def __del__(self):
@@ -131,7 +132,7 @@ class ArgumentParser():
             # и/или число гененрируемых парольных фраз (длина sys.argv может быть увеличена до 5)
             # в противном случае - неверный формат ввода
             if len(sys.argv) == 3 or (len(sys.argv) == 5 and ('--count' in sys.argv or '-c' in sys.argv)):
-                xkcd_obj = XKCD()
+                xkcd_obj = XKCD(self.__xkcd_dict)
                 # генерируем парольные фразы и выводим пользователю
                 for ind in range(int(self.__args.count)):
                     print(xkcd_obj.generate_passphrase(self.__args.xkcd))

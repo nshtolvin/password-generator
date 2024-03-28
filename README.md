@@ -24,7 +24,7 @@ main.py [-c COUNT] [-w WORD_COUNT] [-l LETTER_COUNT] [-n] [-s] [-u]
 main.py -c 2 -w 4 -n
 
 # generate password using xkcd library
-pwdgen [--xkcd {weak,standard,strong,super}] [-c COUNT]
+main.py [--xkcd {weak,standard,strong,super}] [-c COUNT]
 # for example: generate 3 xkcd super password
 main.py -xkcd super -c 3
 ```
