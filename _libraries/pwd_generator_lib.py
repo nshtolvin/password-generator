@@ -95,7 +95,7 @@ class PwdGen(DictFileWorker, Config):
             'INFN': f'{dict_files_path}/verbs.txt'
         }
 
-        # обновляем пользовательские (кастомные) параметры парольной фразы, занося из в словарь __PASSPHRASE_PRESETS
+        # обновляем пользовательские (кастомные) параметры парольной фразы, занося их в словарь __PASSPHRASE_PRESETS["custom"]
         # параметры хранятся в поле радительского класса Config и были предварительно считаны из conf.ini
         custom_options = self.get_options()
         self.__update_custom_passphrase_options(options=custom_options, is_upd_file=False)
@@ -231,6 +231,18 @@ class PwdGen(DictFileWorker, Config):
         print(f'    use of numbers - {self.__PASSPHRASE_PRESETS[compl]["use_numbers"]}')
         print(f'    use of special characters - {self.__PASSPHRASE_PRESETS[compl]["use_special"]}')
         print(f'    capitalize the first letter of each word - {self.__PASSPHRASE_PRESETS[compl]["use_upper_case"]}')
+    
+    def reset_passphrase_options_to_defaults(self) -> int:
+        """
+        Сброс кастомных (пользовательских) параметров генерируемой парольной фразы к значениям по умолчанию.
+        Значения по умолчанию содержатся изначально в словаре __PASSPHRASE_PRESETS["custom"]
+        :return: 0 - параметры по умолчанию успешно записаны в конфигурационный файл, -1 - в противном случае
+        """
+        # обновляем данные в конфигурационном файле conf.ini
+        res = self.set_defaults_options()
+        # обновляем пользовательские (кастомные) параметры парольной фразы, занося их в словарь __PASSPHRASE_PRESETS["custom"]
+        self.__update_custom_passphrase_options(options=self.get_options(), is_upd_file=False)
+        return res
     
     def set_custom_passphrase_options(self) -> None:
         """

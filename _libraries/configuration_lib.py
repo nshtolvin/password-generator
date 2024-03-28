@@ -96,11 +96,11 @@ class Config():
             self.set_defaults_options()
             return self.__defaults
     
-    def set_options(self, options:dict) -> None:
+    def set_options(self, options:dict) -> int:
         """
         Метод преобразования введенных пользователем кастомных параметров парольной фразы в поля объекта ConfigParser
         :param options: словарь с пользовательскими параметрами парольной фразы
-        :return: None
+        :return: 0 - данные успешно записаны в конфигурационный файл, -1 - в противном случае
         """
         # если в текщих пользовательских параметрах нет секции passphrase, то она добавляется
         if not self.__config.has_section('passphrase'):
@@ -111,11 +111,12 @@ class Config():
         # запись изменений в файл
         return self.write_settings()
     
-    def set_defaults_options(self) -> None:
+    def set_defaults_options(self) -> int:
         """
         Сброс всех пользовательских параметров парольной фразы в значения по умолчанию. Метод применяется если:
         1. Не найдена секция passphrase в конфигурационном файле
         2. Название какого-либо из параметров секции passphrase изменено или параметр вовсе отсутсвует
+        :return: 0 - параметры по умолчанию успешно записаны в конфигурационный файл, -1 - в противном случае
         """
         # удаление всех текущих секций
         for itm in self.__config.sections():

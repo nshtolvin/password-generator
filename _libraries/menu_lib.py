@@ -42,7 +42,7 @@ class Menu():
                     continue
                 if int(compl_input) == 7:
                     # сброс кастомных (пользовательских) параметров парольной фразы к дефолтным значениям
-                    if self.__pwd_gen.set_defaults_options() == 0:
+                    if self.__pwd_gen.reset_passphrase_options_to_defaults() == 0:
                         print(f'Custom passphrase settings have been restored to defauls.')
                         self.__pwd_gen.show_passphrase_options('custom')
                     else:
