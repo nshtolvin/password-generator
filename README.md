@@ -69,5 +69,7 @@ When editing [conf.ini](conf.ini), it is only allowed to change the parameter va
 
 Deleting or changing a parameter, entering a parameter value outside of the allowed values, will result in the use of the default parameters.
 
-## Requirements (Installation)
-You need the [following](requirements.txt) libraries to use the project.
+## Installation
+To use this utility in source code, you will need the _python_ interpreter and the _pip_ package management system (for Windows, these components will need to be installed; or you can download the executable file of this utility from the [Releases page](https://github.com/nshtolvin/password-generator/releases)). For full use you will also need to install dependencies [dependencies](requirements.txt) (you can also use more recent versions of [xkcdpass](https://github.com/redacted/XKCD-password-generator)).
+
+You can also run the utility in an isolated environment by making it, for example, using [virtualenv](https://virtualenv.pypa.io/en/latest/installation.html).
